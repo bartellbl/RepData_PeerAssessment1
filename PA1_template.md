@@ -102,21 +102,31 @@ The mean and median of the new imputed data set are 10766.19 and 10766.19, respe
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
-There may be differences in activity patternsbetween weekdays and weekends. 
+There may be differences in activity patterns between weekdays and weekends. We would expect people to be more active during the day time on the weekend because many people will not be going to their regularly weekday job.
 
 
 ```r
 df<-data.frame(newdata)
 df$day<-weekdays(as.Date(df$date))
-head(df)
+
+df$weekend<-NA
+we<-c("Saturday","Sunday")
+df$weekend<-df$day %in% we
+stepsbyintwe<-aggregate(df$steps,by=df[c("interval","weekend")],FUN=mean,na.rm=T)
 ```
 
+We can plot the weekday activity and the weekend activity patterns to compare and identify differences.
+
+
+```r
+par(mfrow=c(2,1))
+plot(stepsbyintwe$interval[stepsbyintwe$weekend==TRUE],stepsbyintwe$x[stepsbyintwe$weekend==TRUE],type="l",
+  xlab="Time Interval",ylab="Average Number of Steps",main="Daily Weekend Steps Activity Pattern by Time Interval", ylim=c(0,225))
+
+plot(stepsbyintwe$interval[stepsbyintwe$weekend==FALSE],stepsbyintwe$x[stepsbyintwe$weekend==FALSE],type="l",
+  xlab="Time Interval",ylab="Average Number of Steps",main="Daily Weekday Steps Activity Pattern by Time Interval", ylim=c(0,225))
 ```
-##       steps       date interval    day
-## 1 1.7169811 2012-10-01        0 Monday
-## 2 0.3396226 2012-10-01        5 Monday
-## 3 0.1320755 2012-10-01       10 Monday
-## 4 0.1509434 2012-10-01       15 Monday
-## 5 0.0754717 2012-10-01       20 Monday
-## 6 2.0943396 2012-10-01       25 Monday
-```
+
+![plot of chunk unnamed-chunk-10](figure/unnamed-chunk-10-1.png) 
+
+It appears the pattern for weekend stepping is clearly different from the weekday behavior. The morning peak is shorter and the steps are more evenly distributed throughout the day. There also appears to be more variability which may be attributable to varying weekend activities.
